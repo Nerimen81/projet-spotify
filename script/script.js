@@ -1,5 +1,7 @@
 function spotifApp() {
+
   return {
+
     tracks: [],
 
     async init() {
@@ -17,7 +19,7 @@ function spotifApp() {
       const counter = {};
 
       this.tracks.forEach(t => {
-        t.artists.forEach(a => {
+        t.artists?.forEach(a => {
           counter[a.name] = (counter[a.name] || 0) + 1;
         });
       });
@@ -33,7 +35,7 @@ function spotifApp() {
       if (!ctx) return;
 
       new Chart(ctx, {
-        type: 'bar', 
+        type: 'bar',
         data: {
           labels,
           datasets: [{
@@ -62,7 +64,7 @@ function spotifApp() {
       const counter = {};
 
       this.tracks.forEach(t => {
-        t.artists.forEach(a => {
+        t.artists?.forEach(a => {
           (a.genres || []).forEach(g => {
             counter[g] = (counter[g] || 0) + 1;
           });
@@ -118,3 +120,7 @@ function spotifApp() {
     }
   };
 }
+
+document.addEventListener('alpine:init', () => {
+  Alpine.data('spotifApp', spotifApp);
+});
