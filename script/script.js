@@ -13,7 +13,18 @@ function spotifApp() {
         this.buildChartGenres();
       });
     },
-
+    get topAlbums() {
+      const map = new Map();
+      this.tracks.forEach(t => {
+        const alb = t.album;
+        if (!map.has(alb.id) || alb.popularity > map.get(alb.id).popularity) {
+          map.set(alb.id, alb);
+        }
+      });
+      return [...map.values()]
+        .sort((a, b) => b.popularity - a.popularity)
+        .slice(0, 12);
+    },
     // Graphique 1 : Top 10 des artistes
     buildChartArtistes() {
       const counter = {};
