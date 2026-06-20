@@ -155,76 +155,142 @@
     <div class="modal fade" id="detailModal" tabindex="-1"
          aria-labelledby="detailModalLabel" aria-modal="true" role="dialog">
       <div class="modal-dialog modal-lg modal-dialog-centered">
-        <div class="modal-content" x-show="selectedTrack">
+        <div class="modal-content">
+
           <div class="modal-header">
-            <h2 class="modal-title h5" id="detailModalLabel"
-                x-text="selectedTrack ? selectedTrack.name : ''"></h2>
+            <h2 class="modal-title h5" id="detailModalLabel">Détails du morceau</h2>
             <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Fermer"></button>
           </div>
-          <div class="modal-body" x-show="selectedTrack">
+
+          <div class="modal-body">
             <template x-if="selectedTrack">
-              <div class="row g-3">
+              <div class="row g-4">
+
+                <!-- Colonne gauche : pochette + infos album -->
                 <div class="col-md-4 text-center">
                   <img
                     :src="selectedTrack.album.images[1]?.url || selectedTrack.album.images[0]?.url"
                     :alt="'Pochette de ' + selectedTrack.album.name"
-                    class="img-fluid rounded shadow"
-                    style="max-width:180px;"
+                    class="img-fluid rounded-3 shadow mb-3"
+                    style="max-width:200px;"
                   />
-                </div>
-                <div class="col-md-8">
-                  <p class="mb-1"><strong>Artiste :</strong>
-                    <span x-text="selectedTrack.artists.map(a=>a.name).join(', ')"></span>
-                  </p>
-                  <p class="mb-1"><strong>Album :</strong>
-                    <span x-text="selectedTrack.album.name"></span>
-                  </p>
-                  <p class="mb-1"><strong>Date de sortie :</strong>
-                    <span x-text="formatDate(selectedTrack.album.release_date)"></span>
-                  </p>
-                  <p class="mb-1"><strong>Durée :</strong>
-                    <span x-text="formatDuration(selectedTrack.duration_ms)"></span>
-                  </p>
-                  <p class="mb-1"><strong>Popularité :</strong></p>
-                  <div class="progress mb-2" style="height:12px;"
-                       role="progressbar"
-                       :aria-valuenow="selectedTrack.popularity"
-                       aria-valuemin="0" aria-valuemax="100"
-                       :aria-label="'Popularité : ' + selectedTrack.popularity + ' sur 100'">
-                    <div class="progress-bar bg-success"
-                         :style="'width:' + selectedTrack.popularity + '%'"
-                         x-text="selectedTrack.popularity + '/100'">
-                    </div>
+                  <div class="fw-semibold text-truncate" x-text="selectedTrack.name" :title="selectedTrack.name"></div>
+                  <div class="text-muted small mt-1"
+                       x-text="formatDate(selectedTrack.album.release_date) + ' · ' + selectedTrack.album.total_tracks + ' titres'">
                   </div>
-                  <p class="mb-1"><strong>Genres :</strong>
-                    <span x-text="selectedTrack.artists.flatMap(a=>a.genres).filter((v,i,s)=>s.indexOf(v)===i).join(', ') || 'N/A'"></span>
-                  </p>
-                  <p class="mb-1"><strong>Explicite :</strong>
-                    <span x-text="selectedTrack.explicit ? 'Oui' : 'Non'"></span>
-                    <span x-show="selectedTrack.explicit" class="badge text-bg-danger ms-1" aria-label="Contenu explicite">E</span>
-                  </p>
-                  <p class="mb-1"><strong>Numéro dans l'album :</strong>
-                    <span x-text="'Piste n°' + selectedTrack.track_number + ' / ' + selectedTrack.album.total_tracks"></span>
-                  </p>
+                  <span class="badge rounded-pill mt-2 text-white" style="background:#1DB954;">
+                    Popularité&nbsp;: <span x-text="selectedTrack.album.popularity"></span>/100
+                  </span>
+                </div>
+
+                <!-- Colonne droite : détails -->
+                <div class="col-md-8">
+                  <h3 class="h5 fw-bold mb-3" x-text="selectedTrack.name"></h3>
+
+                  <!-- Preview audio -->
                   <template x-if="selectedTrack.preview_url">
-                    <div class="mt-3">
-                      <p class="mb-1"><strong>Écouter un extrait :</strong></p>
+                    <div class="mb-3">
+                      <div class="text-muted small fw-semibold mb-1">Preview audio</div>
                       <audio controls :src="selectedTrack.preview_url"
-                             aria-label="Extrait audio du morceau" class="w-100">
+                             class="w-100" aria-label="Extrait audio du morceau">
                         Votre navigateur ne supporte pas l'élément audio.
                       </audio>
                     </div>
                   </template>
+
+                  <!-- Tableau d'informations -->
+                  <div class="fw-semibold mb-2">Informations sur le morceau</div>
+                  <table class="table table-sm table-borderless mb-3">
+                    <tbody>
+                      <tr class="border-bottom">
+                        <td class="text-muted ps-0">Durée</td>
+                        <td class="text-end pe-0">
+                          <span class="badge rounded-pill text-white" style="background:#133464;"
+                                x-text="formatDuration(selectedTrack.duration_ms)"></span>
+                        </td>
+                      </tr>
+                      <tr class="border-bottom">
+                        <td class="text-muted ps-0">Popularité</td>
+                        <td class="pe-0">
+                          <div class="d-flex align-items-center gap-2 justify-content-end">
+                            <div class="progress flex-grow-1" style="height:8px; max-width:120px;"
+                                 role="progressbar"
+                                 :aria-valuenow="selectedTrack.popularity"
+                                 aria-valuemin="0" aria-valuemax="100">
+                              <div class="progress-bar" style="background:#00b4d8;"
+                                   :style="'width:'+selectedTrack.popularity+'%'"></div>
+                            </div>
+                            <span class="text-muted small" x-text="selectedTrack.popularity+'/100'"></span>
+                          </div>
+                        </td>
+                      </tr>
+                      <tr class="border-bottom">
+                        <td class="text-muted ps-0">Numéro de piste</td>
+                        <td class="text-end pe-0 text-muted" x-text="selectedTrack.track_number"></td>
+                      </tr>
+                      <tr>
+                        <td class="text-muted ps-0">Explicit</td>
+                        <td class="text-end pe-0 fw-semibold"
+                            :class="selectedTrack.explicit ? 'text-danger' : 'text-success'"
+                            x-text="selectedTrack.explicit ? 'Oui' : 'Non'">
+                        </td>
+                      </tr>
+                    </tbody>
+                  </table>
+
+                  <!-- Artistes -->
+                  <div class="fw-semibold mb-2">Artistes</div>
+                  <div class="d-flex flex-column gap-2 mb-3">
+                    <template x-for="artist in selectedTrack.artists" :key="artist.id">
+                      <div class="d-flex align-items-center gap-3">
+                        <img
+                          :src="artist.images?.[1]?.url || artist.images?.[0]?.url || 'https://via.placeholder.com/40'"
+                          :alt="artist.name"
+                          class="rounded-circle flex-shrink-0"
+                          style="width:44px;height:44px;object-fit:cover;"
+                        />
+                        <div>
+                          <div class="fw-semibold small" x-text="artist.name"></div>
+                          <div class="text-muted" style="font-size:.75rem;">
+                            Popularité&nbsp;: <span x-text="artist.popularity"></span>/100
+                            &nbsp;·&nbsp; Followers&nbsp;: <span x-text="(artist.followers?.total ?? 0).toLocaleString('fr-FR')"></span>
+                          </div>
+                        </div>
+                      </div>
+                    </template>
+                  </div>
+
+                  <!-- Genres -->
+                  <div class="fw-semibold mb-2">Genres</div>
+                  <div class="d-flex flex-wrap gap-1">
+                    <template x-for="genre in selectedTrack.artists.flatMap(a=>a.genres).filter((v,i,s)=>s.indexOf(v)===i)" :key="genre">
+                      <span class="badge rounded-pill text-white" style="background:#333;" x-text="genre"></span>
+                    </template>
+                    <span x-show="selectedTrack.artists.flatMap(a=>a.genres).length === 0"
+                          class="text-muted small">N/A</span>
+                  </div>
+
                 </div>
               </div>
             </template>
           </div>
+
           <div class="modal-footer">
+            <template x-if="selectedTrack">
+              <a :href="'https://www.deezer.com/track/' + selectedTrack.id"
+                 target="_blank" rel="noopener noreferrer"
+                 class="btn text-white me-auto"
+                 style="background:#a238ff;">
+                <i class="bi bi-music-note-beamed me-1" aria-hidden="true"></i>Ouvrir dans Deezer
+              </a>
+            </template>
             <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Fermer</button>
           </div>
+
         </div>
       </div>
     </div>
+    
 
     <footer class="text-center py-4 mt-5 border-top text-muted small">
       © 2025 J-Music Explorer - Projet étudiant MMI
