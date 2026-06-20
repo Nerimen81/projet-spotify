@@ -3,6 +3,38 @@ function spotifApp() {
   return {
 
     tracks: [],
+    search: '',
+    selectedTrack: null,
+
+    get filteredTracks() {
+      const q = this.search.toLowerCase().trim();
+      if (!q) return this.tracks;
+      return this.tracks.filter(t =>
+        t.name.toLowerCase().includes(q) ||
+        t.artists.some(a => a.name.toLowerCase().includes(q)) ||
+        t.album.name.toLowerCase().includes(q)
+      );
+    },
+
+    openModal(track) {
+      this.selectedTrack = track;
+    },
+
+    formatDate(dateStr) {
+      if (!dateStr) return '';
+      const [y, m, d] = dateStr.split('-');
+      if (!m) return y;
+      const months = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+      return (d ? d + ' ' : '') + months[parseInt(m, 10) - 1] + ' ' + y;
+    },
+
+    formatDuration(ms) {
+      if (!ms) return '0:00';
+      const total = Math.round(ms / 1000);
+      const min = Math.floor(total / 60);
+      const sec = total % 60;
+      return min + ':' + String(sec).padStart(2, '0');
+    },
 
     async init() {
       const res = await fetch('data/data.json');
@@ -25,6 +57,7 @@ function spotifApp() {
         .sort((a, b) => b.popularity - a.popularity)
         .slice(0, 12);
     },
+    
     // Graphique 1 : Top 10 des artistes
     buildChartArtistes() {
       const counter = {};
