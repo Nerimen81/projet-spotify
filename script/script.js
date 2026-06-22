@@ -17,16 +17,19 @@ function spotifApp() {
     },
 
     openModal(track) {
-      this.selectedTrack = track;
-    },
-
-    formatDate(dateStr) {
-      if (!dateStr) return '';
-      const [y, m, d] = dateStr.split('-');
-      if (!m) return y;
-      const months = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
-      return (d ? d + ' ' : '') + months[parseInt(m, 10) - 1] + ' ' + y;
-    },
+  this.selectedTrack = track;
+  const cb = `dz_${track.id}_${Date.now()}`;
+  window[cb] = (data) => {
+    this.selectedTrack = { ...this.selectedTrack, preview_url: data.preview ?? '' };
+    delete window[cb];
+    document.getElementById(cb)?.remove();
+  };
+  const s = document.createElement('script');
+  s.id = cb;
+  s.src = `https://api.deezer.com/track/${track.id}?output=jsonp&callback=${cb}`;
+  s.onerror = () => { delete window[cb]; s.remove(); };
+  document.head.appendChild(s);
+},
 
     formatDuration(ms) {
       if (!ms) return '0:00';
