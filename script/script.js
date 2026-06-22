@@ -31,6 +31,14 @@ function spotifApp() {
   document.head.appendChild(s);
 },
 
+    formatDate(dateStr) {
+      if (!dateStr) return '';
+      const [y, m, d] = dateStr.split('-');
+      if (!m) return y;
+      const months = ['janv.','févr.','mars','avr.','mai','juin','juil.','août','sept.','oct.','nov.','déc.'];
+      return (d ? d + ' ' : '') + months[parseInt(m, 10) - 1] + ' ' + y;
+    },
+
     formatDuration(ms) {
       if (!ms) return '0:00';
       const total = Math.round(ms / 1000);
