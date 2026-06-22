@@ -17,12 +17,7 @@ function spotifApp() {
     },
 
     openModal(track) {
-      this.selectedTrack = { ...track, preview_url: null };
-      fetch(`https://api.deezer.com/track/${track.id}`)
-        .then(r => r.json())
-        .then(data => {
-          this.selectedTrack = { ...track, preview_url: data.preview };
-        });
+      this.selectedTrack = track;
     },
 
     formatDate(dateStr) {
